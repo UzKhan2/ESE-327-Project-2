@@ -5,6 +5,7 @@
 #include <sstream>	//string stream lib	
 #include<fstream>
 #include <map> // hash table library
+#include<random> // random library to test the accuracy of the decision tree model
 #include"Tree.h"
 
 
