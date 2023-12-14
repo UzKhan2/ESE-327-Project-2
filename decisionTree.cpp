@@ -12,7 +12,7 @@ using namespace std;
 class Node
 {
 public:
-    string data;
+    string split;
     Node *left;
     Node *right;
     friend class DecisionTree;
@@ -23,9 +23,9 @@ class DecisionTree
 public:
     DecisionTree();
     void addSplit(Node *parent);
+    void addSplit(Node *parent, vector<vector<string>> left, vector<vector<string>> right);
     void display();
     void addData(Node *current, string in);
-    void addData(Node *current, int val);
     double calculateEntropy(vector<vector<string>> database, Node *current);
     void extractClass(vector<vector<string>> database);
     void classNums(vector<vector<string>> database);
@@ -40,9 +40,7 @@ public:
 DecisionTree::DecisionTree()
 {
     root = new Node;
-    root->data = "";
-    root->left = nullptr;
-    root->right = nullptr;
+    root->split = "";
 }
 
 void DecisionTree::addSplit(Node *parent)
@@ -54,13 +52,13 @@ void DecisionTree::addSplit(Node *parent)
 
     // Create left branch
     Node *leftChild = new Node;
-    leftChild->data = "";
+    leftChild->split = "";
     leftChild->left = nullptr;
     leftChild->right = nullptr;
 
     // Create right branch
     Node *rightChild = new Node;
-    rightChild->data = "";
+    rightChild->split = "";
     rightChild->left = nullptr;
     rightChild->right = nullptr;
 
@@ -85,7 +83,7 @@ void DecisionTree::display()
         Node *current = nodeQueue.front();
         nodeQueue.pop();
 
-        cout << current->data << " ";
+        cout << current->split << " ";
 
         if (current->left != nullptr)
         {
@@ -102,12 +100,34 @@ void DecisionTree::display()
 
 void DecisionTree::addData(Node *current, string in)
 {
-    current->data = in;
+    current->split = in;
 }
 
-void DecisionTree::addData(Node *current, int val)
+void DecisionTree::addSplit(Node *parent, vector<vector<string>> left, vector<vector<string>> right)
 {
-    current->data = val;
+    if (parent == nullptr)
+    {
+        return;
+    }
+
+    // Create left branch
+    Node *leftChild = new Node;
+    leftChild->split = "";
+    leftChild->left = nullptr;
+    leftChild->right = nullptr;
+
+    // Create right branch
+    Node *rightChild = new Node;
+    rightChild->split = "";
+    rightChild->left = nullptr;
+    rightChild->right = nullptr;
+
+    // Connect to parent
+    parent->left = leftChild;
+    parent->right = rightChild;
+
+    calculateEntropy(left, parent->left);
+    calculateEntropy(right, parent->right);
 }
 
 double DecisionTree::calculateEntropy(vector<vector<string>> database, Node *current)
@@ -117,14 +137,12 @@ double DecisionTree::calculateEntropy(vector<vector<string>> database, Node *cur
     vector<double> ent;
     double gain = 10;
     double entropy = 0.0;
-    vector<int> pos;
+    int pos[3];
+    classNums(database);
     for (int i = 0; i < database.size(); i++)
     {
         for (int j = 0; j < database[i].size() - 1; j++)
         {
-            right = databaseResize(database, stof(database[i][j]), j);
-            left = dataleftResize(database, stof(database[i][j]), j);
-            classNums(right);
             int total = 0;
             for (int k = 0; k < classes.size(); k++)
             {
@@ -141,33 +159,45 @@ double DecisionTree::calculateEntropy(vector<vector<string>> database, Node *cur
                     if (gain > entropy)
                     {
                         gain = entropy;
-                        pos.push_back(i);
-                        pos.push_back(j);
-                        pos.push_back(k);
+                        pos[0] = i;
+                        pos[1] = j;
+                        pos[2] = k;
                     }
-                    cout << entropy << " ";
-                    ent.push_back(entropy);
+                    // cout << entropy << " ";
+                    // ent.push_back(entropy);
                 }
-            }
-        }
-        cout << "gain " << gain;
-        for (int i = 0; i < ent.size(); i++)
-        {
-            if (gain > ent[i])
-            {
-                gain = ent[i];
             }
         }
     }
 
-    for (int i = 0; i < database.size(); ++i)
+    int x = pos[0];
+    int y = pos[1];
+    // cout << i << " " << j << " " << database[i][j];
+    addData(current, database[x][y]);
+
+    right = databaseResize(database, stof(database[x][y]), y);
+    left = dataleftResize(database, stof(database[x][x]), y);
+
+    for (int i = 0; i < right.size(); i++)
     {
-        for (int j = 0; j < database[i].size() - 1; ++j)
+        if (y < right[i].size())
         {
-            database[i].erase(database[i].begin() + j);
+            right[i].erase(right[i].begin() + y);
+            // left[i].erase(left[i].begin() + y);
         }
     }
-    classNums(left);
+
+    for (int i = 0; i < left.size(); i++)
+    {
+        if (y < left[i].size())
+        {
+
+            left[i].erase(left[i].begin() + y);
+        }
+    }
+
+    if (entropy > .01)
+        addSplit(current, left, right);
 
     return entropy;
 }
@@ -273,31 +303,9 @@ int main()
         }
     }
 
-    Node *currentNode = Tree.root;
-    for (int i = 0; i < database.size(); i++)
-    {
-
-        Tree.addData(currentNode, database[i][database[i].size() - 1]);
-        if (currentNode->left == nullptr)
-        {
-            Tree.addSplit(currentNode);
-            currentNode = currentNode->left;
-        }
-
-        else
-        {
-            if (currentNode->right == nullptr)
-            {
-                Tree.addSplit(currentNode);
-            }
-            currentNode = currentNode->right;
-        }
-
-        // Add the instance class to the current node
-    }
-    // Tree.display();
-    //  Tree.classNums(database);
     Tree.calculateEntropy(database, Tree.root);
+
+    Tree.display();
 
     infile.close();
     return 0;
