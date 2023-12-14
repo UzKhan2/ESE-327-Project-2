@@ -15,7 +15,6 @@ vector<string> string_split(string str);
 vector<string> get_artributes();
 vector<vector<string>> scan_database();
 void print_database(vector<vector<string>> &database);
-bool digitCheck(string str);
 vector<vector<string>> testData(vector<vector<string>> dataset);
 map<string, int> findClasses(vector<vector<string>>& database);
 string findMajority(map<string, int>& table);
@@ -77,7 +76,6 @@ vector<vector<string>> scan_database() {
 		dataset_size++;
 	}
 	dataset_size--;
-
 	return database;
 }
 
@@ -92,15 +90,6 @@ void print_database(vector<vector<string>> &database) {
 		cout << endl;
 	}
 
-}
-
-bool digitCheck(string str) {
-	bool digit = true;
-	for (int i = 0; i < str.size(); i++) {
-		if (isdigit(str[i]) == 0)
-			return false;
-	}
-	return true;
 }
 
 
@@ -119,14 +108,14 @@ vector<vector<string>> testData(vector<vector<string>> dataset) {
 map<string, int> findClasses(vector<vector<string>>& database) {
 	map<string, int> table;
 	//cout << "Database size: " << database.size() << endl;
-	for (int i = 0; i < database.size()-1; i++) {
+	for (int i = 0; i < database.size(); i++) {
 		//cout << "Class: " << database[i][database[0].size() - 1] << endl;
 		if (table.find(database[i][database[0].size() -1]) == table.end())
 			table[database[i][database[0].size() -1]] = 1;
 
 		else
 			table[database[i][database[0].size() -1]]++;
-	}
+	}//for
 
 	return table;
 }
@@ -145,7 +134,7 @@ string findMajority(map<string, int> &table) {
 	return max_artribute;
 }
 
-void printMap(map<string, int>& table) {
+void printMap(map<string, float>& table) {
 	for (auto it = table.begin(); it != table.end(); ++it)
 	{
 		cout << "Class: " << it->first << "   Value: " << it->second << endl;
@@ -155,46 +144,24 @@ void printMap(map<string, int>& table) {
 
 int main() {
 	vector<string> artributes;
+	vector<float> range;
 	vector<vector<string>> database, testDataset;
 	string majority;
 	Node* node = new Node("Root");
 	DecisionTree tree(node);
 	map<string, int> table;
+	map<string, float> bestSplit;
 	tree.setRoot(node);
- 
 	//artributes = get_artributes(); 
-	//database = scan_database();
+	database = scan_database();
 	//cout << "Dataset" << endl;
 	//print_database(database);
 	//testDataset = testData(database);
 	//cout << "test Dataset" << endl;
 	//print_database(testDataset);
 	//table = findClasses(database);
-	//cout << majority << endl;
-	//printMap(table);
-	 // tree test
-	/*Node* n1 = new Node("1");
-	Node* n2 = new Node("2");
-	Node* n3 = new Node("3");
-	Node* n4 = new Node("4");
-	Node* n5 = new Node("5");
-	Node* n6 = new Node("6");
-	Node* n7 = new Node("7");
-	Node* n8 = new Node("8");
-	Node* n9 = new Node("9");
-	tree.root->addChild(n1);
-	tree.root->addChild(n2);
-	tree.root->addChild(n3);
-	vector<Node*> children;
-	children = tree.root->getChildren();
-	children[0]->addChild(n4);
-	children[1]->addChild(n5);
-	children[1]->addChild(n6);
-	children[1]->addChild(n7);
-	children[2]->addChild(n8);
-	children[2]->addChild(n9);
-	tree.printTree();*/
-
+	tree.buildTree(tree.getRoot(), database);
+	tree.printTree();
 
 	return 0;
 }
