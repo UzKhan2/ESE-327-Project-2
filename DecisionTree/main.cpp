@@ -10,7 +10,7 @@
 
 using namespace std;
 
-
+time_t start, end;
 vector<string> string_split(string str);
 vector<string> get_artributes();
 vector<vector<string>> scan_database();
@@ -59,7 +59,7 @@ vector<vector<string>> scan_database() {
 	cout << "Please enter a database file directory: ";
 	cin >> fileName;
 	inFile.open(fileName);
-
+	time(&start);
 	if (!inFile) {
 		cerr << "Can not open the file " << fileName << endl;
 		exit(1);
@@ -141,8 +141,8 @@ void printMap(map<string, float>& table) {
 	}
 }
 
-
 int main() {
+	time_t end;
 	vector<string> artributes;
 	vector<float> range;
 	vector<vector<string>> database, testDataset;
@@ -170,11 +170,17 @@ int main() {
 		result = tree.predict(database[m]);
 		if (!result.compare(database[m][classIndex])) {
 			correctPredict++;
-			cout << "Correct Predict: " << correctPredict << endl;
+			//cout << "Correct Predict: " << correctPredict << endl;
 		}
-		cout << "Expected: " << database[m][classIndex] << "		" << "Predicted: " << result << endl;
+		//cout << "Expected: " << database[m][classIndex] << "		" << "Predicted: " << result << endl;
 	}//for
 	accuracy = static_cast<float>(correctPredict) / totalSample;
 	cout << "Accuracy: " << accuracy << endl;
+
+	time(&end);
+	double time_taken = double(end - start);
+	cout << "Time taken by program is : " << fixed
+		<< time_taken;
+	cout << " sec " << endl;
 	return 0;
 }
