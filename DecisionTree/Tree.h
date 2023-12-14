@@ -30,4 +30,5 @@ public:
 	float findStep(float gap);
 	int getSum(map<string, int> distribution);
 	bool digitCheck(string str);
+	string predict(vector<string> sample);
 };
