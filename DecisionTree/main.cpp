@@ -162,6 +162,19 @@ int main() {
 	//table = findClasses(database);
 	tree.buildTree(tree.getRoot(), database);
 	tree.printTree();
-
+	int totalSample = database.size(), correctPredict = 0;
+	int classIndex = database[0].size() - 1;
+	string result = " ";
+	float accuracy = 0.0;
+	for (int m = 0; m < database.size(); m++) {
+		result = tree.predict(database[m]);
+		if (!result.compare(database[m][classIndex])) {
+			correctPredict++;
+			cout << "Correct Predict: " << correctPredict << endl;
+		}
+		cout << "Expected: " << database[m][classIndex] << "		" << "Predicted: " << result << endl;
+	}//for
+	accuracy = static_cast<float>(correctPredict) / totalSample;
+	cout << "Accuracy: " << accuracy << endl;
 	return 0;
 }
