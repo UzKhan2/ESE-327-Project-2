@@ -67,7 +67,7 @@ void DecisionTree::buildTree(Node* node, vector<vector<string>>& dataset) {
 	node->setValue(majorityClass);
 
 	if (bestSplit["weightedGini"] == 0) {
-		cout << "Weighted Gini == 0" << endl;
+		//cout << "Weighted Gini == 0" << endl;
 		return;
 	}
 
@@ -310,4 +310,26 @@ int DecisionTree::getSum(map<string, int> distribution) {
 		sum += it->second;
 	}
 	return sum;
+}
+
+
+string DecisionTree::predict(vector<string> sample) {
+	int featureIndex = 0, threshold = 0;
+	string majorityClass;
+	Node* current = this->root;
+	while (!current->children.empty()) {
+		featureIndex = current->GetFeature();
+		threshold = current->getThreshold();
+		majorityClass = current->getValue();
+
+		if (stof(sample[featureIndex]) <= threshold) {
+			current = current->children[0];
+		}//if
+
+		else {
+			current = current->children[1];
+		}//else
+
+	}//while
+	return majorityClass;
 }
